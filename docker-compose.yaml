@@ -1,23 +1,22 @@
 name: firecrawl
 
 x-common-service: &common-service
-  # NOTE: If you don't want to build the service locally,
-  # uncomment the build: statement and comment out the image: statement
+  # Uncomment this line and comment out the line below to use the pre-built image:
   # image: ghcr.io/firecrawl/firecrawl
   build: apps/api
-
   ulimits:
     nofile:
       soft: 65535
       hard: 65535
   networks:
     - backend
+    - dokploy-network
   extra_hosts:
     - "host.docker.internal:host-gateway"
 
 x-common-env: &common-env
   REDIS_URL: ${REDIS_URL:-redis://redis:6379}
-  REDIS_RATE_LIMIT_URL: ${REDIS_URL:-redis://redis:6379}
+  REDIS_RATE_LIMIT_URL: ${REDIS_RATE_LIMIT_URL:-redis://redis:6379}
   PLAYWRIGHT_MICROSERVICE_URL: ${PLAYWRIGHT_MICROSERVICE_URL:-http://playwright-service:3000/scrape}
   USE_DB_AUTHENTICATION: ${USE_DB_AUTHENTICATION}
   OPENAI_API_KEY: ${OPENAI_API_KEY}
@@ -46,8 +45,7 @@ x-common-env: &common-env
 
 services:
   playwright-service:
-    # NOTE: If you don't want to build the service locally,
-    # uncomment the build: statement and comment out the image: statement
+    # Uncomment this line and comment out the build: below for pre-built image:
     # image: ghcr.io/firecrawl/playwright-service:latest
     build: apps/playwright-service-ts
     environment:
@@ -58,6 +56,7 @@ services:
       BLOCK_MEDIA: ${BLOCK_MEDIA}
     networks:
       - backend
+      - dokploy-network
 
   api:
     <<: *common-service
@@ -70,9 +69,16 @@ services:
     depends_on:
       - redis
       - playwright-service
-    ports:
-      - "${PORT:-3002}:${INTERNAL_PORT:-3002}"
+    expose:
+      - "${INTERNAL_PORT:-3002}"
     command: [ "pnpm", "run", "start:production" ]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.firecrawl-api.rule=Host(`firecrawl.martin-linde.com`)
+      - traefik.http.routers.firecrawl-api.entrypoints=websecure
+      - traefik.http.routers.firecrawl-api.tls.certresolver=letsencrypt
+      - traefik.http.services.firecrawl-api.loadbalancer.server.port=3002
+      - traefik.docker.network=dokploy-network
 
   worker:
     <<: *common-service
@@ -87,12 +93,7 @@ services:
     command: [ "pnpm", "run", "workers" ]
 
   redis:
-    # NOTE: If you want to use Valkey (open source) instead of Redis (source available),
-    # uncomment the Valkey statement and comment out the Redis statement.
-    # Using Valkey with Firecrawl is untested and not guaranteed to work. Use with caution.
     image: redis:alpine
-    # image: valkey/valkey:alpine
-
     networks:
       - backend
     command: redis-server --bind 0.0.0.0
@@ -100,3 +101,5 @@ services:
 networks:
   backend:
     driver: bridge
+  dokploy-network:
+    external: true
