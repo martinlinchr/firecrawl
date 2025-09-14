@@ -49,7 +49,6 @@ services:
     # image: ghcr.io/firecrawl/playwright-service:latest
     build: apps/playwright-service-ts
     environment:
-      - USE_DB_AUTHENTICATION=false
       PORT: 3000
       PROXY_SERVER: ${PROXY_SERVER}
       PROXY_USERNAME: ${PROXY_USERNAME}
