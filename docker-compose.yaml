@@ -49,12 +49,12 @@ services:
     # image: ghcr.io/firecrawl/playwright-service:latest
     build: apps/playwright-service-ts
     environment:
+      - USE_DB_AUTHENTICATION=false
       PORT: 3000
       PROXY_SERVER: ${PROXY_SERVER}
       PROXY_USERNAME: ${PROXY_USERNAME}
       PROXY_PASSWORD: ${PROXY_PASSWORD}
       BLOCK_MEDIA: ${BLOCK_MEDIA}
-      - USE_DB_AUTHENTICATION=false
     networks:
       - backend
       - dokploy-network
