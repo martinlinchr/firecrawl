@@ -57,6 +57,8 @@ services:
     networks:
       - backend
       - dokploy-network
+    environment:
+      - USE_DB_AUTHENTICATION=false
 
   api:
     <<: *common-service
