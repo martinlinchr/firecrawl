@@ -44,19 +44,18 @@ x-common-env: &common-env
   SEARXNG_CATEGORIES: ${SEARXNG_CATEGORIES}
 
 services:
-  playwright-service:
-    # Uncomment this line and comment out the build: below for pre-built image:
-    # image: ghcr.io/firecrawl/playwright-service:latest
-    build: apps/playwright-service-ts
-    environment:
-      PORT: 3000
-      PROXY_SERVER: ${PROXY_SERVER}
-      PROXY_USERNAME: ${PROXY_USERNAME}
-      PROXY_PASSWORD: ${PROXY_PASSWORD}
-      BLOCK_MEDIA: ${BLOCK_MEDIA}
-    networks:
-      - backend
-      - dokploy-network
+  # playwright-service:
+  #   # image: ghcr.io/firecrawl/playwright-service:latest
+  #   build: apps/playwright-service-ts
+  #   environment:
+  #     PORT: 3000
+  #     PROXY_SERVER: ${PROXY_SERVER}
+  #     PROXY_USERNAME: ${PROXY_USERNAME}
+  #     PROXY_PASSWORD: ${PROXY_PASSWORD}
+  #     BLOCK_MEDIA: ${BLOCK_MEDIA}
+  #   networks:
+  #     - backend
+  #     - dokploy-network
 
   api:
     <<: *common-service
