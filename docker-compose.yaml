@@ -28,10 +28,11 @@ x-common-env: &common-env
   SEARXNG_ENDPOINT: ${SEARXNG_ENDPOINT}
   SEARXNG_ENGINES: ${SEARXNG_ENGINES}
   SEARXNG_CATEGORIES: ${SEARXNG_CATEGORIES}
-  NUQ_DATABASE_URL: ${NUQ_DATABASE_URL}
-  DATABASE_URL: ${DATABASE_URL}
 
+  NUQ_DATABASE_URL: postgresql://firecrawl:nfkrSgsrR6SG38D@dokploy-postgres.1.jl29mw14l7r8ym604rgx43cpz:5432/firecrawl
+  DATABASE_URL: postgresql://firecrawl:nfkrSgsrR6SG38D@dokploy-postgres.1.jl29mw14l7r8ym604rgx43cpz:5432/firecrawl
   NUQ_RABBITMQ_URL: amqp://guest:guest@localhost:5672
+  PGHOST: dokploy-postgres.1.jl29mw14l7r8ym604rgx43cpz
 
 services:
   api:
