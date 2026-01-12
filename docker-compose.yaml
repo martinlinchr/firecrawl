@@ -29,10 +29,13 @@ x-common-env: &common-env
   SEARXNG_ENGINES: ${SEARXNG_ENGINES}
   SEARXNG_CATEGORIES: ${SEARXNG_CATEGORIES}
 
-  NUQ_DATABASE_URL: postgresql://firecrawl:nfkrSgsrR6SG38D@dokploy-postgres.1.jl29mw14l7r8ym604rgx43cpz:5432/firecrawl
-  DATABASE_URL: postgresql://firecrawl:nfkrSgsrR6SG38D@dokploy-postgres.1.jl29mw14l7r8ym604rgx43cpz:5432/firecrawl
-  NUQ_RABBITMQ_URL: amqp://guest:guest@localhost:5672
+  NUQ_DATABASE_URL: postgresql://firecrawl:nfkrSgsrR6SG38D@pg-firecrawl:5432/firecrawl
+  DATABASE_URL: postgresql://firecrawl:nfkrSgsrR6SG38D@pg-firecrawl:5432/firecrawl
   PGHOST: pg-firecrawl
+  # NUQ_DATABASE_URL: postgresql://firecrawl:nfkrSgsrR6SG38D@dokploy-postgres.1.jl29mw14l7r8ym604rgx43cpz:5432/firecrawl
+  # DATABASE_URL: postgresql://firecrawl:nfkrSgsrR6SG38D@dokploy-postgres.1.jl29mw14l7r8ym604rgx43cpz:5432/firecrawl
+  NUQ_RABBITMQ_URL: amqp://guest:guest@localhost:5672
+  # PGHOST: pg-firecrawl
 
 services:
   api:
