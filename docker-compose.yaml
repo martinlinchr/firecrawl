@@ -1,9 +1,7 @@
 name: firecrawl
 
 x-common-service: &common-service
-  # Uncomment this line and comment out the line below to use the pre-built image:
-  # image: ghcr.io/firecrawl/firecrawl
-  build: apps/api
+  image: ghcr.io/firecrawl/firecrawl
   ulimits:
     nofile:
       soft: 65535
@@ -17,13 +15,13 @@ x-common-service: &common-service
 x-common-env: &common-env
   REDIS_URL: ${REDIS_URL:-redis://redis:6379}
   REDIS_RATE_LIMIT_URL: ${REDIS_RATE_LIMIT_URL:-redis://redis:6379}
-  PLAYWRIGHT_MICROSERVICE_URL: ${PLAYWRIGHT_MICROSERVICE_URL}
+  PLAYWRIGHT_MICROSERVICE_URL: ${PLAYWRIGHT_MICROSERVICE_URL:-https://playwright.martin-linde.com/scrape}
   USE_DB_AUTHENTICATION: ${USE_DB_AUTHENTICATION}
   OPENAI_API_KEY: ${OPENAI_API_KEY}
   OPENAI_BASE_URL: ${OPENAI_BASE_URL}
   MODEL_NAME: ${MODEL_NAME}
-  MODEL_EMBEDDING_NAME: ${MODEL_EMBEDDING_NAME} 
-  OLLAMA_BASE_URL: ${OLLAMA_BASE_URL} 
+  MODEL_EMBEDDING_NAME: ${MODEL_EMBEDDING_NAME}
+  OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
   SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
   BULL_AUTH_KEY: ${BULL_AUTH_KEY}
   TEST_API_KEY: ${TEST_API_KEY}
@@ -44,19 +42,6 @@ x-common-env: &common-env
   SEARXNG_CATEGORIES: ${SEARXNG_CATEGORIES}
 
 services:
-  # playwright-service:
-  #   # image: ghcr.io/firecrawl/playwright-service:latest
-  #   build: apps/playwright-service-ts
-  #   environment:
-  #     PORT: 3000
-  #     PROXY_SERVER: ${PROXY_SERVER}
-  #     PROXY_USERNAME: ${PROXY_USERNAME}
-  #     PROXY_PASSWORD: ${PROXY_PASSWORD}
-  #     BLOCK_MEDIA: ${BLOCK_MEDIA}
-  #   networks:
-  #     - backend
-  #     - dokploy-network
-
   api:
     <<: *common-service
     environment:
@@ -67,7 +52,6 @@ services:
       ENV: local
     depends_on:
       - redis
-      - playwright-service
     expose:
       - "${INTERNAL_PORT:-3002}"
     command: [ "pnpm", "run", "start:production" ]
@@ -87,7 +71,6 @@ services:
       ENV: local
     depends_on:
       - redis
-      - playwright-service
       - api
     command: [ "pnpm", "run", "workers" ]
 
@@ -96,9 +79,3 @@ services:
     networks:
       - backend
     command: redis-server --bind 0.0.0.0
-
-networks:
-  backend:
-    driver: bridge
-  dokploy-network:
-    external: true
