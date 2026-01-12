@@ -1,16 +1,5 @@
 name: firecrawl
 
-x-common-service: &common-service
-  image: ghcr.io/firecrawl/firecrawl
-  ulimits:
-    nofile:
-      soft: 65535
-      hard: 65535
-  networks:
-    - backend
-  extra_hosts:
-    - "host.docker.internal:host-gateway"
-
 x-common-env: &common-env
   REDIS_URL: ${REDIS_URL:-redis://redis:6379}
   REDIS_RATE_LIMIT_URL: ${REDIS_RATE_LIMIT_URL:-redis://redis:6379}
@@ -42,7 +31,7 @@ x-common-env: &common-env
 
 services:
   api:
-    <<: *common-service
+    image: ghcr.io/firecrawl/firecrawl:latest
     environment:
       <<: *common-env
       HOST: "0.0.0.0"
@@ -53,7 +42,6 @@ services:
       - redis
     expose:
       - "${INTERNAL_PORT:-3002}"
-    command: [ "pnpm", "run", "start:production" ]
     labels:
       - traefik.enable=true
       - traefik.http.routers.firecrawl-api.rule=Host(`firecrawl.martin-linde.com`)
@@ -62,7 +50,7 @@ services:
       - traefik.http.services.firecrawl-api.loadbalancer.server.port=3002
 
   worker:
-    <<: *common-service
+    image: ghcr.io/firecrawl/firecrawl:latest
     environment:
       <<: *common-env
       FLY_PROCESS_GROUP: worker
@@ -70,14 +58,7 @@ services:
     depends_on:
       - redis
       - api
-    command: [ "pnpm", "run", "workers" ]
 
   redis:
     image: redis:alpine
-    networks:
-      - backend
     command: redis-server --bind 0.0.0.0
-
-networks:
-  backend:
-    driver: bridge
